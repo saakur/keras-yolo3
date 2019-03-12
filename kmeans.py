@@ -82,6 +82,7 @@ class YOLO_Kmeans:
                 #     int(infos[i].split(",")[1])
                 width = int(float(infos[i].split(",")[2])*512)
                 height = int(float(infos[i].split(",")[3])*512)
+                print(width, height)
                 dataSet.append([width, height])
         result = np.array(dataSet)
         f.close()
