@@ -45,7 +45,8 @@ def resblock_body(x, num_filters, num_blocks):
 
 def darknet_body(x):
     '''Darknent body having 52 Convolution2D layers'''
-    x = DarknetConv2D_BN_Leaky(32, (3,3))(x)
+    # x = DarknetConv2D_BN_Leaky(32, (3,3))(x)
+    x = DarknetConv2D_BN_Leaky(32, (3,3), name="4Channel_IP")(x)
     x = resblock_body(x, 64, 1)
     x = resblock_body(x, 128, 2)
     x = resblock_body(x, 256, 8)
