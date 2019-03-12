@@ -37,7 +37,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     '''random preprocessing for real-time data augmentation'''
     line = annotation_line.split()
     image = Image.open(line[0])
-    print(np.array(image).shape)
+    # print(np.array(image).shape)
     iw, ih = image.size
     h, w = input_shape
     # print(iw, ih, w, h)
@@ -128,7 +128,8 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         # zeros[dy:,dx:] = m[:l-(w-dx)+1, :m-(h-dy)+1]
         new_image1 = np.dstack((image_data, alpha))
         image_data = new_image1
-
+    print(image_data.shape)
+    sys.exit(0)
     # correct boxes
     box_data = np.zeros((max_boxes,5))
     if len(box)>0:
