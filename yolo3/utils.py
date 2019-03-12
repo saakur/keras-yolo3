@@ -118,8 +118,10 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         # new_image1 = Image.fromarray(image_data)
         # new_image1.putalpha(alpha)
         print(image_data.shape, np.array(alpha).shape)
-        zeros = np.zeros((nw,nh))
-        zeros[dy:, dx:] = alpha
+        l,m = np.array(alpha).shape
+        zeros = np.zeros((w,h))
+        # zeros[dy:, dx:] = alpha
+        zeros[dy:,dx:] = m[:l-(w-dx)+1, :m-(h-dy)+1]
         new_image1 = np.dstack((image_data, zeros))
         image_data = new_image1
 
