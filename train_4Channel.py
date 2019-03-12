@@ -15,15 +15,15 @@ from keras.utils import multi_gpu_model
 
 
 def _main():
-    annotation_path = 'train.txt'
+    annotation_path = '/data/saakur/ActionDetection-TrecVID/Sathya/4Channel/TrecVID_PC_Train_4Channel_Keras.txt'
     log_dir = 'logs/000/'
-    classes_path = 'model_data/voc_classes.txt'
-    anchors_path = 'model_data/yolo_anchors.txt'
+    classes_path = 'model_data/TrecVID.txt'
+    anchors_path = 'model_data/yolo_anchors_TrecVID.txt'
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
     anchors = get_anchors(anchors_path)
 
-    input_shape = (416,416) # multiple of 32, hw
+    input_shape = (512,512) # multiple of 32, hw
 
     is_tiny_version = len(anchors)==6 # default setting
     if is_tiny_version:
@@ -31,7 +31,7 @@ def _main():
             freeze_body=2, weights_path='model_data/tiny_yolo_weights.h5')
     else:
         model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='yolo_weights.h5') # make sure you know what you freeze
+            freeze_body=2, weights_path='model_data/yolo_weights.h5') # make sure you know what you freeze
 
     num_gpus = 4
     model = multi_gpu_model(model, gpus=num_gpus)
