@@ -33,13 +33,16 @@ def letterbox_image(image, size):
 def rand(a=0, b=1):
     return np.random.rand()*(b-a) + a
 
-def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jitter=.3, hue=.1, sat=1.5, val=1.5, proc_img=True):
+def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jitter=.3, hue=.1, sat=1.5, val=1.5, proc_img=True, scaled=False, scaleFactor=512):
     '''random preprocessing for real-time data augmentation'''
     line = annotation_line.split()
     image = Image.open(line[0])
     iw, ih = image.size
     h, w = input_shape
-    box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
+    if scaled:
+        box = np.array([np.array([x*scaleFactor if i < 4 else x for i,x in enumerate(list(map(int,box.split(','))))]) for box in line[1:]])
+    else:
+        box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
 
     if not random:
         # resize image
@@ -51,7 +54,10 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         image_data=0
         if proc_img:
             image = image.resize((nw,nh), Image.BICUBIC)
-            new_image = Image.new('RGB', (w,h), (128,128,128))
+            if not scaled:
+                new_image = Image.new('RGB', (w,h), (128,128,128))
+            else:
+                new_image = Image.new('RGBA', (w,h), (128,128,128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)/255.
 
@@ -76,6 +82,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         nw = int(scale*w)
         nh = int(nw/new_ar)
     image = image.resize((nw,nh), Image.BICUBIC)
+    alpha = image.split()[-1]
 
     # place image
     dx = int(rand(0, w-nw))
@@ -101,6 +108,10 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     x[x>1] = 1
     x[x<0] = 0
     image_data = hsv_to_rgb(x) # numpy array, 0 to 1
+    if scaled:
+        new_image = Image.new('RGBA', (w,h), (128,128,128))
+        new_image.paste(image_data, (dx, dy), alpha)
+        image_data = new_image
 
     # correct boxes
     box_data = np.zeros((max_boxes,5))
