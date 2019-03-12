@@ -76,10 +76,12 @@ class YOLO_Kmeans:
             infos = line.split(" ")
             length = len(infos)
             for i in range(1, length):
-                width = int(infos[i].split(",")[2]) - \
-                    int(infos[i].split(",")[0])
-                height = int(infos[i].split(",")[3]) - \
-                    int(infos[i].split(",")[1])
+                # width = int(infos[i].split(",")[2]) - \
+                #     int(infos[i].split(",")[0])
+                # height = int(infos[i].split(",")[3]) - \
+                #     int(infos[i].split(",")[1])
+                width = int(float(infos[i].split(",")[2])*512)
+                height = int(float(infos[i].split(",")[3])*512)
                 dataSet.append([width, height])
         result = np.array(dataSet)
         f.close()
