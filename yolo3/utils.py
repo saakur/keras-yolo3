@@ -110,10 +110,11 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     x[x<0] = 0
     image_data = hsv_to_rgb(x) # numpy array, 0 to 1
     if scaled:
-        print((w,h), (dx, dy))
-        new_image = Image.new('RGBA', (w,h), (128,128,128, 128))
-        new_image.paste(image_data, (dx, dy), alpha)
-        image_data = new_image
+        # print((w,h), (dx, dy))
+        # new_image1 = Image.new('RGBA', (w,h), (128,128,128, 128))
+        # new_image1.paste(image_data, (dx, dy), alpha)
+        # image_data = new_image1
+        image_data.putalpha(alpha)
 
     # correct boxes
     box_data = np.zeros((max_boxes,5))
