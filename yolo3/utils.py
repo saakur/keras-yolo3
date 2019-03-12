@@ -116,8 +116,8 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         # image_data = new_image1
         # new_image1 = Image.fromarray(image_data)
         # new_image1.putalpha(alpha)
-        print(image_data.shape, alpha.shape)
-        new_image1 = np.dstack((image_data, alpha))
+        print(image_data.shape, np.array(alpha).shape)
+        new_image1 = np.dstack((image_data, np.array(alpha)))
         image_data = new_image1
 
     # correct boxes
