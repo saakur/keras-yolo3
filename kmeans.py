@@ -103,6 +103,6 @@ class YOLO_Kmeans:
 if __name__ == "__main__":
     cluster_number = 9
     # filename = "2012_train.txt"
-    filename = "/data/saakur/ActionDetection-TrecVID/Sathya/4Channel/TrecVID_PC_Train_4Channel.txt"
+    filename = "/data/saakur/ActionDetection-TrecVID/Sathya/4Channel/TrecVID_PC_Train_4Channel_Keras.txt"
     kmeans = YOLO_Kmeans(cluster_number, filename)
     kmeans.txt2clusters()
