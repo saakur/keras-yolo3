@@ -85,6 +85,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         nh = int(nw/new_ar)
 
     image = image.resize((nw,nh), Image.BICUBIC)
+    print(np.array(image).shape)
     alpha = image.split()[-1]
 
     # place image
