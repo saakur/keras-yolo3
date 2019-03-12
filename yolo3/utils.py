@@ -114,7 +114,8 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         # new_image1 = Image.new('RGBA', (w,h), (128,128,128, 128))
         # new_image1.paste(image_data, (dx, dy), alpha)
         # image_data = new_image1
-        image_data.putalpha(alpha)
+        new_image1 = Image.fromarray(image_data)
+        new_image1.putalpha(alpha)
 
     # correct boxes
     box_data = np.zeros((max_boxes,5))
