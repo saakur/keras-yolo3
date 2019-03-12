@@ -95,7 +95,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     image = new_image
     alpha = image.split()[-1]
     image = image.convert('RGB')
-    
+
     # flip image or not
     flip = rand()<.5
     if flip: image = image.transpose(Image.FLIP_LEFT_RIGHT)
@@ -126,7 +126,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         # zeros = np.zeros((w,h))
         # # zeros[dy:, dx:] = alpha
         # zeros[dy:,dx:] = m[:l-(w-dx)+1, :m-(h-dy)+1]
-        new_image1 = np.dstack((image_data, zeros))
+        new_image1 = np.dstack((image_data, alpha))
         image_data = new_image1
 
     # correct boxes
