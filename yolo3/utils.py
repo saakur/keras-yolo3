@@ -85,15 +85,15 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         nh = int(nw/new_ar)
 
     image = image.resize((nw,nh), Image.BICUBIC)
-    print(np.array(image).shape)
     alpha = image.split()[-1]
 
     # place image
     dx = int(rand(0, w-nw))
     dy = int(rand(0, h-nh))
-    new_image = Image.new('RGB', (w,h), (128,128,128))
-    new_image.paste(image, (dx, dy))
+    new_image = Image.new('RGBA', (w,h), (128,128,128))
+    new_image.paste(image, (dx, dy), alpha)
     image = new_image
+    alpha = image.split()[-1]
 
     # flip image or not
     flip = rand()<.5
@@ -112,6 +112,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     x[x>1] = 1
     x[x<0] = 0
     image_data = hsv_to_rgb(x) # numpy array, 0 to 1
+    print("afterHSV", image_data.shape)
     if scaled:
         # print((w,h), (dx, dy))
         # new_image1 = Image.new('RGBA', (w,h), (128,128,128, 128))
