@@ -73,17 +73,17 @@ class YOLO_Kmeans:
         f = open(self.filename, 'r')
         dataSet = []
         for line in f:
-            print(line)
+            # print(line)
             infos = line.split(" ")
-            print(infos)
+            # print(infos)
             length = len(infos)
             for i in range(1, length):
                 # width = int(infos[i].split(",")[2]) - \
                 #     int(infos[i].split(",")[0])
                 # height = int(infos[i].split(",")[3]) - \
                 #     int(infos[i].split(",")[1])
-                width = int(float(infos[i].split(",")[2])*512)
-                height = int(float(infos[i].split(",")[3])*512)
+                width = int(float(infos[i].split(",")[2]))
+                height = int(float(infos[i].split(",")[3]))
                 print(width, height)
                 dataSet.append([width, height])
         result = np.array(dataSet)
