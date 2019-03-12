@@ -54,6 +54,7 @@ def _main():
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
     if True:
+        model.layers[0].trainable = True
         model.compile(optimizer=Adam(lr=1e-3), loss={
             # use custom yolo_loss Lambda layer.
             'yolo_loss': lambda y_true, y_pred: y_pred})
@@ -110,7 +111,7 @@ def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze
             weights_path='model_data/yolo_weights.h5'):
     '''create the training model'''
     K.clear_session() # get a new session
-    image_input = Input(shape=(None, None, 3))
+    image_input = Input(shape=(None, None, 4))
     h, w = input_shape
     num_anchors = len(anchors)
 

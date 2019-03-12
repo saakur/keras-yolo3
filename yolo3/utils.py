@@ -39,10 +39,8 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     image = Image.open(line[0])
     iw, ih = image.size
     h, w = input_shape
-    if scaled:
-        box = np.array([np.array([x*scaleFactor if i < 4 else x for i,x in enumerate(list(map(int,box.split(','))))]) for box in line[1:]])
-    else:
-        box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
+    
+    box = np.array([np.array(list(map(int,box.split(',')))) for box in line[1:]])
 
     if not random:
         # resize image
@@ -54,11 +52,14 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         image_data=0
         if proc_img:
             image = image.resize((nw,nh), Image.BICUBIC)
+            alpha = image.split()[-1]
             if not scaled:
                 new_image = Image.new('RGB', (w,h), (128,128,128))
+                new_image.paste(image, (dx, dy))
             else:
                 new_image = Image.new('RGBA', (w,h), (128,128,128))
-            new_image.paste(image, (dx, dy))
+                new_image.paste(image, (dx, dy), alpha)
+            
             image_data = np.array(new_image)/255.
 
         # correct boxes
