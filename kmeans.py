@@ -5,7 +5,8 @@ class YOLO_Kmeans:
 
     def __init__(self, cluster_number, filename):
         self.cluster_number = cluster_number
-        self.filename = "2012_train.txt"
+        # self.filename = "2012_train.txt"
+        self.filename = filename#"TrecVID_PC_Train_4Channel.txt"
 
     def iou(self, boxes, clusters):  # 1 box -> k clusters
         n = boxes.shape[0]
@@ -58,7 +59,7 @@ class YOLO_Kmeans:
         return clusters
 
     def result2txt(self, data):
-        f = open("yolo_anchors.txt", 'w')
+        f = open("yolo_anchors_TrecVID.txt", 'w')
         row = np.shape(data)[0]
         for i in range(row):
             if i == 0:
@@ -96,6 +97,7 @@ class YOLO_Kmeans:
 
 if __name__ == "__main__":
     cluster_number = 9
-    filename = "2012_train.txt"
+    # filename = "2012_train.txt"
+    filename = "/data/saakur/ActionDetection-TrecVID/Sathya/4Channel/TrecVID_PC_Train_4Channel.txt"
     kmeans = YOLO_Kmeans(cluster_number, filename)
     kmeans.txt2clusters()

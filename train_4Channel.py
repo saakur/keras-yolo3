@@ -31,7 +31,7 @@ def _main():
             freeze_body=2, weights_path='model_data/tiny_yolo_weights.h5')
     else:
         model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='model_data/yolo_weights.h5') # make sure you know what you freeze
+            freeze_body=2, weights_path='yolo_weights.h5') # make sure you know what you freeze
 
     num_gpus = 4
     model = multi_gpu_model(model, gpus=num_gpus)
