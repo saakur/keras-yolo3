@@ -37,6 +37,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     '''random preprocessing for real-time data augmentation'''
     line = annotation_line.split()
     image = Image.open(line[0])
+    print(np.array(image).shape)
     iw, ih = image.size
     h, w = input_shape
     # print(iw, ih, w, h)
