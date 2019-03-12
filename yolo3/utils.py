@@ -82,6 +82,7 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
     else:
         nw = int(scale*w)
         nh = int(nw/new_ar)
+
     image = image.resize((nw,nh), Image.BICUBIC)
     alpha = image.split()[-1]
 
@@ -117,7 +118,9 @@ def get_random_data(annotation_line, input_shape, random=True, max_boxes=20, jit
         # new_image1 = Image.fromarray(image_data)
         # new_image1.putalpha(alpha)
         print(image_data.shape, np.array(alpha).shape)
-        new_image1 = np.dstack((image_data, np.array(alpha)))
+        zeros = np.zeros((w,h))
+        zeros[dy:, dx:] = alpha
+        new_image1 = np.dstack((image_data, zeros))
         image_data = new_image1
 
     # correct boxes
