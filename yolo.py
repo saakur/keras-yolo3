@@ -81,7 +81,9 @@ class YOLO(object):
         #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
         #         'Mismatch between model and given anchor and class sizes'
 
-        self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
+        # self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
+        self.yolo_model = yolo_body(image_input, num_anchors//3, num_classes)
+        self.model_body.load_weights('/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5')
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
