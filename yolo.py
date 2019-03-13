@@ -17,6 +17,7 @@ from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo3.utils import letterbox_image
 import os
 from keras.utils import multi_gpu_model
+from train_4Channel_2 import create_model
 
 class YOLO(object):
     _defaults = {
@@ -67,16 +68,18 @@ class YOLO(object):
         num_anchors = len(self.anchors)
         num_classes = len(self.class_names)
         is_tiny_version = num_anchors==6 # default setting
-        try:
-            self.yolo_model = load_model(model_path, compile=False)
-        except:
-            self.yolo_model = tiny_yolo_body(Input(shape=(None,None,3)), num_anchors//2, num_classes) \
-                if is_tiny_version else yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes)
-            self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
-        else:
-            assert self.yolo_model.layers[-1].output_shape[-1] == \
-                num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
-                'Mismatch between model and given anchor and class sizes'
+        # try:
+        #     self.yolo_model = load_model(model_path, compile=False)
+        # except:
+        #     self.yolo_model = tiny_yolo_body(Input(shape=(None,None,3)), num_anchors//2, num_classes) \
+        #         if is_tiny_version else yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes)
+        #     self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
+        # else:
+        #     assert self.yolo_model.layers[-1].output_shape[-1] == \
+        #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
+        #         'Mismatch between model and given anchor and class sizes'
+
+        model = create_model(input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
