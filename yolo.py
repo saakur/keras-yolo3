@@ -26,7 +26,7 @@ class YOLO(object):
         "classes_path": 'model_data/coco_classes.txt',
         "score" : 0.3,
         "iou" : 0.45,
-        "model_image_size" : (416, 416),
+        "model_image_size" : (512, 512),
         "gpu_num" : 1,
     }
 
@@ -44,6 +44,7 @@ class YOLO(object):
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
         self.boxes, self.scores, self.classes = self.generate()
+        self.input_shape = self.__dict__["model_image_size"]
 
     def _get_class(self):
         classes_path = os.path.expanduser(self.classes_path)
@@ -79,7 +80,7 @@ class YOLO(object):
         #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
         #         'Mismatch between model and given anchor and class sizes'
 
-        model = create_model(input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
+        model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
