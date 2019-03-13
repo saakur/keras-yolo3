@@ -25,7 +25,7 @@ class YOLO(object):
         "anchors_path": 'model_data/yolo_anchors.txt',
         "classes_path": 'model_data/coco_classes.txt',
         "score" : 0.3,
-        "iou" : 0.45,
+        "iou" : 0.75,
         "model_image_size" : (512, 512),
         "gpu_num" : 4,
     }
