@@ -43,10 +43,21 @@ def resblock_body(x, num_filters, num_blocks):
         x = Add()([x,y])
     return x
 
-def darknet_body(x):
+def darknet_body(x, inputs):
     '''Darknent body having 52 Convolution2D layers'''
     # x = DarknetConv2D_BN_Leaky(32, (3,3))(x)
     x = DarknetConv2D_BN_Leaky(32, (3,3), name="4Channel_IP")(x)
+    x = resblock_body(x, 64, 1)
+    x = resblock_body(x, 128, 2)
+    x = resblock_body(x, 256, 8)
+    x = resblock_body(x, 512, 8)
+    x = resblock_body(x, 1024, 4)
+    return x
+
+def darknet_body1(x, inputs):
+    '''Darknent body having 52 Convolution2D layers'''
+    # x = DarknetConv2D_BN_Leaky(32, (3,3))(x)
+    x = DarknetConv2D_BN_Leaky(32, (3,3), name="4Channel_IP", input_shape=input_shape)(x)
     x = resblock_body(x, 64, 1)
     x = resblock_body(x, 128, 2)
     x = resblock_body(x, 256, 8)
@@ -71,6 +82,25 @@ def make_last_layers(x, num_filters, out_filters):
 def yolo_body(inputs, num_anchors, num_classes):
     """Create YOLO_V3 model CNN body in Keras."""
     darknet = Model(inputs, darknet_body(inputs))
+    x, y1 = make_last_layers(darknet.output, 512, num_anchors*(num_classes+5))
+
+    x = compose(
+            DarknetConv2D_BN_Leaky(256, (1,1)),
+            UpSampling2D(2))(x)
+    x = Concatenate()([x,darknet.layers[152].output])
+    x, y2 = make_last_layers(x, 256, num_anchors*(num_classes+5))
+
+    x = compose(
+            DarknetConv2D_BN_Leaky(128, (1,1)),
+            UpSampling2D(2))(x)
+    x = Concatenate()([x,darknet.layers[92].output])
+    x, y3 = make_last_layers(x, 128, num_anchors*(num_classes+5))
+
+    return Model(inputs, [y1,y2,y3])
+
+def yolo_body1(inputs, num_anchors, num_classes):
+    """Create YOLO_V3 model CNN body in Keras."""
+    darknet = Model(inputs, darknet_body1(inputs, (512,512)))
     x, y1 = make_last_layers(darknet.output, 512, num_anchors*(num_classes+5))
 
     x = compose(
