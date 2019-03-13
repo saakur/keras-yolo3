@@ -43,8 +43,8 @@ class YOLO(object):
         self.class_names = self._get_class()
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
-        self.boxes, self.scores, self.classes = self.generate()
         self.input_shape = self.__dict__["model_image_size"]
+        self.boxes, self.scores, self.classes = self.generate()
 
     def _get_class(self):
         classes_path = os.path.expanduser(self.classes_path)
