@@ -1,5 +1,5 @@
 import sys
-import argparse
+import argparse, cv2
 from yolo import YOLO, detect_video
 from PIL import Image
 
@@ -13,7 +13,8 @@ def detect_img(yolo):
             continue
         else:
             r_image = yolo.detect_image(image)
-            r_image.show()
+            # r_image.show()
+            cv2.write('detections.png', r_image)
     yolo.close_session()
 
 FLAGS = None
