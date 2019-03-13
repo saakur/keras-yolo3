@@ -33,10 +33,7 @@ def _main():
         model = create_model(input_shape, anchors, num_classes,
             freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=False) # make sure you know what you freeze
 
-    json_string = model.to_json()
-    with open("./YOLO_512x512.cfg", 'w') as of:
-        json.dump(json_string, of, indent=2)
-    sys.exit(0)
+    
     num_gpus = 4
     model = multi_gpu_model(model, gpus=num_gpus)
 
@@ -62,7 +59,10 @@ def _main():
         model.compile(optimizer=Adam(lr=1e-3), loss={
             # use custom yolo_loss Lambda layer.
             'yolo_loss': lambda y_true, y_pred: y_pred[0]})
-
+        json_string = model.to_json()
+        with open("./YOLO_512x512.cfg", 'w') as of:
+            json.dump(json_string, of, indent=2)
+        sys.exit(0)
         batch_size = 32
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
