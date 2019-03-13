@@ -14,7 +14,7 @@ def detect_img(yolo):
         else:
             r_image = yolo.detect_image(image)
             # r_image.show()
-            cv2.imwrite('detections.png', r_image)
+            cv2.imwrite('detections.png', np.array(r_image))
     yolo.close_session()
 
 FLAGS = None
