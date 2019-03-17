@@ -14,7 +14,7 @@ from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 from keras.optimizers import Adam
 
-from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body, yolo_body1, yolo_eval1
+from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body, yolo_body1
 from yolo3.utils import letterbox_image
 import os, sys, h5py
 from keras.utils import multi_gpu_model
@@ -28,7 +28,7 @@ class YOLO(object):
         "score" : 0.3,
         "iou" : 0.45,
         "model_image_size" : (512, 512),
-        "gpu_num" : 1,
+        "gpu_num" : 2,
     }
 
     @classmethod
@@ -99,8 +99,8 @@ class YOLO(object):
         # v = h5py.File('foo.h5', 'r')
         # keys = list(v.keys())
         num_classes = len(self.class_names)
-        self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path=self.model_path, load_pretrained=True) # make sure you know what you freeze
-
+        self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path=self.model_path, load_pretrained=False) # make sure you know what you freeze
+        self.yolo_model.load_weights(self.model_path)
         # for i in range(len(self.yolo_model.layers)):
         #     print(self.yolo_model.layers[i].name, self.yolo_model.layers[i].name in keys)
         #     if self.yolo_model.layers[i].name in keys:
@@ -128,7 +128,7 @@ class YOLO(object):
         self.input_image_shape = K.placeholder(shape=(2, ))
         if self.gpu_num>=2:
             self.yolo_model = multi_gpu_model(self.yolo_model, gpus=self.gpu_num)
-        boxes, scores, classes = yolo_eval1(self.yolo_model.output, self.anchors,
+        boxes, scores, classes = yolo_eval(self.yolo_model.output, self.anchors,
                 len(self.class_names), self.input_image_shape,
                 score_threshold=self.score, iou_threshold=self.iou)
         return boxes, scores, classes
