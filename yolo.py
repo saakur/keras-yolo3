@@ -93,12 +93,12 @@ class YOLO(object):
         keys = list(v.keys())
 
 
-        for i in range(len(self.yolo_model.layers)):
-            print(self.yolo_model.layers[i].name, self.yolo_model.layers[i].name in keys)
-            if self.yolo_model.layers[i].name in keys:
-                self.yolo_model.layers[i].set_weights()
+        # for i in range(len(self.yolo_model.layers)):
+        #     print(self.yolo_model.layers[i].name, self.yolo_model.layers[i].name in keys)
+        #     if self.yolo_model.layers[i].name in keys:
+        #         self.yolo_model.layers[i].set_weights()
 
-        sys.exit(0)
+        # sys.exit(0)
         # self.yolo_model.compile()
         # self.yolo_model.load_weights('/data/saakur/keras-yolo3/logs/000/ep001-loss59.197-val_loss32.265_1.h5')
         # self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
