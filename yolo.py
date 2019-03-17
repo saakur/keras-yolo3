@@ -83,9 +83,10 @@ class YOLO(object):
         #         'Mismatch between model and given anchor and class sizes'
 
         # self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
-        image_input = Input(shape=(512, 512, 4))
-        y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], \
-        num_anchors//3, num_classes+5)) for l in range(3)]
+        image_input = Input(shape=(None, None, 4))
+        h, w = 512,512
+        num_anchors = len(anchors)
+        y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], num_anchors//3, num_classes+5)) for l in range(3)]
         # self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
         self.yolo_model = yolo_body(image_input, num_anchors//3, num_classes)
         # self.yolo_model.compile(optimizer=Adam(lr=0.0))
@@ -93,6 +94,8 @@ class YOLO(object):
 
         model_loss = Lambda(yolo_loss, output_shape=(1,), name='yolo_loss', arguments={'anchors': anchors, 'num_classes': num_classes, 'ignore_thresh': 0.5})([*model_body.output, *y_true])
         self.yolo_model = Model([self.yolo_model.input, *y_true], model_loss)
+        self.yolo_model.compile(optimizer=Adam(lr=0.0))
+        self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match        
         # v = h5py.File('foo.h5', 'r')
         # keys = list(v.keys())
 
