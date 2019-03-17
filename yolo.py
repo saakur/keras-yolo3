@@ -99,7 +99,7 @@ class YOLO(object):
         # v = h5py.File('foo.h5', 'r')
         # keys = list(v.keys())
         num_classes = len(self.class_names)
-        model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path=self.model_path, load_pretrained=True) # make sure you know what you freeze
+        self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path=self.model_path, load_pretrained=True) # make sure you know what you freeze
 
         # for i in range(len(self.yolo_model.layers)):
         #     print(self.yolo_model.layers[i].name, self.yolo_model.layers[i].name in keys)
