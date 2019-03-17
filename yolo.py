@@ -87,7 +87,7 @@ class YOLO(object):
         # self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
         self.yolo_model = yolo_body(image_input, num_anchors//3, num_classes)
         self.yolo_model.compile(optimizer=Adam(lr=0.0))
-        self.yolo_model.load_weights(self.model_path, by_name=True) # make sure model, anchors and classes match
+        self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
 
         # for i in range(len(self.yolo_model.layers)):
         #     print(self.yolo_model.layers[i].name)
