@@ -77,7 +77,7 @@ class YOLO(object):
         #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
         #         'Mismatch between model and given anchor and class sizes'
         self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
-        self.yolo_model.load_weights(self.model_path, by_name=True)
+        # self.yolo_model.load_weights(self.model_path, by_name=True)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
@@ -113,7 +113,7 @@ class YOLO(object):
                               image.height - (image.height % 32))
             boxed_image = letterbox_image(image, new_image_size)
         image_data = np.array(boxed_image, dtype='float32')
-
+        image_data = np.array(image)
         print(image_data.shape)
         image_data /= 255.
         image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
