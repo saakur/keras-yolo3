@@ -14,7 +14,7 @@ from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
 from keras.optimizers import Adam
 
-from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body, yolo_body1
+from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body, yolo_body1, yolo_eval1
 from yolo3.utils import letterbox_image
 import os, sys, h5py
 from keras.utils import multi_gpu_model
