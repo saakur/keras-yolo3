@@ -18,7 +18,7 @@ from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body, yolo_body1
 from yolo3.utils import letterbox_image
 import os, sys, h5py
 from keras.utils import multi_gpu_model
-from train_4Channel_2 import create_model
+from train_4Channel_1 import create_model
 
 class YOLO(object):
     _defaults = {
@@ -83,22 +83,23 @@ class YOLO(object):
         #         'Mismatch between model and given anchor and class sizes'
 
         # self.yolo_model = create_model(self.input_shape, self.anchors, num_classes, freeze_body=2, weights_path='/data/saakur/keras-yolo3/logs/000/ep001-loss54.634-val_loss27.537_512x512.h5', load_pretrained=True)
-        image_input = Input(shape=(None, None, 4))
-        h, w = 512,512
-        num_anchors = len(anchors)
-        y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], num_anchors//3, num_classes+5)) for l in range(3)]
-        # self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
-        self.yolo_model = yolo_body(image_input, num_anchors//3, num_classes)
-        # self.yolo_model.compile(optimizer=Adam(lr=0.0))
-        # self.yolo_model.load_weights(self.model_path, by_name=True, skip_mismatch=True) # make sure model, anchors and classes match
+        # image_input = Input(shape=(None, None, 4))
+        # h, w = 512,512
+        # num_anchors = len(anchors)
+        # y_true = [Input(shape=(h//{0:32, 1:16, 2:8}[l], w//{0:32, 1:16, 2:8}[l], num_anchors//3, num_classes+5)) for l in range(3)]
+        # # self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
+        # self.yolo_model = yolo_body(image_input, num_anchors//3, num_classes)
+        # # self.yolo_model.compile(optimizer=Adam(lr=0.0))
+        # # self.yolo_model.load_weights(self.model_path, by_name=True, skip_mismatch=True) # make sure model, anchors and classes match
 
-        model_loss = Lambda(yolo_loss, output_shape=(1,), name='yolo_loss', arguments={'anchors': anchors, 'num_classes': num_classes, 'ignore_thresh': 0.5})([*model_body.output, *y_true])
-        self.yolo_model = Model([self.yolo_model.input, *y_true], model_loss)
-        self.yolo_model.compile(optimizer=Adam(lr=0.0))
-        self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match        
+        # model_loss = Lambda(yolo_loss, output_shape=(1,), name='yolo_loss', arguments={'anchors': anchors, 'num_classes': num_classes, 'ignore_thresh': 0.5})([*model_body.output, *y_true])
+        # self.yolo_model = Model([self.yolo_model.input, *y_true], model_loss)
+        # self.yolo_model.compile(optimizer=Adam(lr=0.0))
+        # self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match        
         # v = h5py.File('foo.h5', 'r')
         # keys = list(v.keys())
-
+        num_classes = len(self.class_names)
+        model = create_model(selfinput_shape, self.anchors, num_classes, freeze_body=2, weights_path=self.model_path, load_pretrained=True) # make sure you know what you freeze
 
         # for i in range(len(self.yolo_model.layers)):
         #     print(self.yolo_model.layers[i].name, self.yolo_model.layers[i].name in keys)
