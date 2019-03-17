@@ -16,7 +16,7 @@ from keras.optimizers import Adam
 
 from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body, yolo_body1
 from yolo3.utils import letterbox_image
-import os, sys
+import os, sys, h5py
 from keras.utils import multi_gpu_model
 from train_4Channel_2 import create_model
 
@@ -87,12 +87,16 @@ class YOLO(object):
         # self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
         self.yolo_model = yolo_body(image_input, num_anchors//3, num_classes)
         self.yolo_model.compile(optimizer=Adam(lr=0.0))
-        self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
+        # self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
 
-        # for i in range(len(self.yolo_model.layers)):
-        #     print(self.yolo_model.layers[i].name)
+        v = h5py.File('foo.h5', 'r')
+        keys = list(v.keys())
 
-        # sys.exit(0)
+
+        for i in range(len(self.yolo_model.layers)):
+            print(self.yolo_model.layers[i].name, self.yolo_model.layers[i].name in keys)
+
+        sys.exit(0)
         # self.yolo_model.compile()
         # self.yolo_model.load_weights('/data/saakur/keras-yolo3/logs/000/ep001-loss59.197-val_loss32.265_1.h5')
         # self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
