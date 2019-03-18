@@ -12,14 +12,11 @@ from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
-from keras.optimizers import Adam
 
 from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo3.utils import letterbox_image
 import os
 from keras.utils import multi_gpu_model
-from train_4Channel_1 import *
-
 
 class YOLO(object):
     _defaults = {
@@ -69,24 +66,16 @@ class YOLO(object):
         num_anchors = len(self.anchors)
         num_classes = len(self.class_names)
         is_tiny_version = num_anchors==6 # default setting
-        # try:
-        #     self.yolo_model = load_model(model_path, compile=False)
-        # except:
-        #     self.yolo_model = tiny_yolo_body(Input(shape=(None,None,3)), num_anchors//2, num_classes) \
-        #         if is_tiny_version else yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes)
-        #     self.yolo_model.load_weights(self.model_path, by_name=True, skip_mismatch=True) # make sure model, anchors and classes match
-        # else:
-        #     assert self.yolo_model.layers[-1].output_shape[-1] == \
-        #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
-        #         'Mismatch between model and given anchor and class sizes'
-        
-        input_shape = (416,416) # multiple of 32, hw
-        anchors = self.anchors
-        num_classes = len(self.class_names)
-        self.yolo_model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path=self.model_path, load_pretrained=True) # make sure you know what you freeze
-        self.yolo_model.compile(optimizer=Adam(lr=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred[0]})
-        # self.yolo_model.load_weights(self.model_path)
+        try:
+            self.yolo_model = load_model(model_path, compile=False)
+        except:
+            self.yolo_model = tiny_yolo_body(Input(shape=(None,None,3)), num_anchors//2, num_classes) \
+                if is_tiny_version else yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes)
+            self.yolo_model.load_weights(self.model_path) # make sure model, anchors and classes match
+        else:
+            assert self.yolo_model.layers[-1].output_shape[-1] == \
+                num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
+                'Mismatch between model and given anchor and class sizes'
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
@@ -122,7 +111,7 @@ class YOLO(object):
                               image.height - (image.height % 32))
             boxed_image = letterbox_image(image, new_image_size)
         image_data = np.array(boxed_image, dtype='float32')
-        image_data = np.array(image, dtype=np.float32)
+        image_data  = np.array(image, dtype='float32')
         print(image_data.shape)
         image_data /= 255.
         image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
