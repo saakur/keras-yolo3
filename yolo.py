@@ -9,6 +9,7 @@ from timeit import default_timer as timer
 
 import numpy as np
 from keras import backend as K
+from keras.optimizers import Adam
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
@@ -76,7 +77,7 @@ class YOLO(object):
             assert self.yolo_model.layers[-1].output_shape[-1] == \
                 num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
                 'Mismatch between model and given anchor and class sizes'
-        self.yolo_model.compile(optimizer=keras.optimizers.Adam(0.0))
+        self.yolo_model.compile(optimizer=Adam(0.0))
         load_multigpu_checkpoint_weights(self.yolo_model, self.model_path)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
