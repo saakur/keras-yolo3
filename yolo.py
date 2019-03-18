@@ -208,6 +208,7 @@ def load_multigpu_checkpoint_weights(model, h5py_file):
                     if isinstance(layer_weights[term], h5py.Dataset):
                         # Convert weights to numpy array and prepend to list
                         weights.insert(0, np.array(layer_weights[term]))
+                        print(term)
 
                 # Load weights to model
                 layer.set_weights(weights)
