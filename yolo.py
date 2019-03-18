@@ -86,7 +86,7 @@ class YOLO(object):
         self.yolo_model = create_model(input_shape, anchors, num_classes,
             freeze_body=2, weights_path=self.model_path, load_pretrained=True) # make sure you know what you freeze
         self.yolo_model.compile(optimizer=Adam(lr=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred[0]})
-        self.yolo_model.load_weights(self.model_path)
+        # self.yolo_model.load_weights(self.model_path)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
 
