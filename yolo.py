@@ -198,7 +198,8 @@ def load_multigpu_checkpoint_weights(model, h5py_file):
                 layer_weights = weight_file[layer.name]
 
             except:
-                # No weights saved for layer
+                print('No weights saved for layer - %s', layer.name)
+
                 continue
 
             try:
@@ -208,13 +209,12 @@ def load_multigpu_checkpoint_weights(model, h5py_file):
                     if isinstance(layer_weights[term], h5py.Dataset):
                         # Convert weights to numpy array and prepend to list
                         weights.insert(0, np.array(layer_weights[term]))
-                        print(term)
 
                 # Load weights to model
                 layer.set_weights(weights)
 
             except Exception as e:
-                print("Error: Could not load weights for layer:", layer.name, file=stderr)
+                print("Error: Could not load weights for layer:", layer.name)
 
 def detect_video(yolo, video_path, output_path=""):
     import cv2
