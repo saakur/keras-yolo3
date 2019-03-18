@@ -12,6 +12,7 @@ from keras import backend as K
 from keras.models import load_model
 from keras.layers import Input
 from PIL import Image, ImageFont, ImageDraw
+from keras.optimizers import Adam
 
 from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo3.utils import letterbox_image
@@ -77,6 +78,8 @@ class YOLO(object):
         #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
         #         'Mismatch between model and given anchor and class sizes'
         self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
+        self.yolo_model.compile(optimizer=Adam(lr=0.0), loss={'yolo_loss': lambda y_true, y_pred: y_pred[0]})
+        self.yolo_model.fit(x_train,y_train,epochs=0)
         self.yolo_model.load_weights(self.model_path)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
