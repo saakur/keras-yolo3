@@ -18,6 +18,8 @@ from yolo3.model import yolo_eval, yolo_body, tiny_yolo_body
 from yolo3.utils import letterbox_image
 import os
 from keras.utils import multi_gpu_model
+from train_4Channel_1 import *
+
 
 class YOLO(object):
     _defaults = {
@@ -77,9 +79,10 @@ class YOLO(object):
         #     assert self.yolo_model.layers[-1].output_shape[-1] == \
         #         num_anchors/len(self.yolo_model.output) * (num_classes + 5), \
         #         'Mismatch between model and given anchor and class sizes'
-        self.yolo_model = yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
-        self.yolo_model.compile(optimizer=Adam(lr=0.0))
-        # self.yolo_model.fit(x_train,y_train,epochs=0)
+        
+        model = create_model(input_shape, anchors, num_classes,
+            freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=False) # make sure you know what you freeze
+        model.compile(optimizer=Adam(lr=1e-3), loss={'yolo_loss': lambda y_true, y_pred: y_pred[0]})
         self.yolo_model.load_weights(self.model_path)
 
         print('{} model, anchors, and classes loaded.'.format(model_path))
