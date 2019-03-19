@@ -40,7 +40,9 @@ class YOLO(object):
     def __init__(self, **kwargs):
         self.__dict__.update(self._defaults) # set up default values
         self.__dict__.update(kwargs) # and update with user overrides
-        print(self.__dict__)
+        self.iou = self.__dict__['iou']
+        self.score = self.__dict__['score']
+        print(self.score, self.iou)
         self.class_names = self._get_class()
         self.anchors = self._get_anchors()
         self.sess = K.get_session()
