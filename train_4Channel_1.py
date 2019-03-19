@@ -31,7 +31,7 @@ def _main():
             freeze_body=2, weights_path='model_data/tiny_yolo_weights.h5')
     else:
         model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=True) # make sure you know what you freeze
+            freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=False) # make sure you know what you freeze
 
     num_gpus = 4
     model = multi_gpu_model(model, gpus=num_gpus)
@@ -73,6 +73,7 @@ def _main():
     # Unfreeze and continue training, to fine-tune.
     # Train longer if the result is not good.
     if True:
+        load_multigpu_checkpoint_weights(model)
         for i in range(len(model.layers)):
             model.layers[i].trainable = True
         model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
@@ -192,5 +193,54 @@ def data_generator_wrapper(annotation_lines, batch_size, input_shape, anchors, n
     if n==0 or batch_size<=0: return None
     return data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes)
 
+def load_multigpu_checkpoint_weights(model, h5py_file='model_data/yolo_weights.h5'):
+    """
+    Loads the weights of a weight checkpoint from a multi-gpu
+    keras model.
+
+    Input:
+
+        model - keras model to load weights into
+
+        h5py_file - path to the h5py weights file
+
+    Output:
+        None
+    """
+    import h5py
+    from keras.utils.conv_utils import convert_kernel
+
+    print("Setting weights...")
+    with h5py.File(h5py_file, "r") as file:
+
+        # Get model subset in file - other layers are empty
+
+        for layer in model.layers:
+            weight_file = file
+
+            try:
+                layer_weights = weight_file[layer.name]
+
+            except:
+                print('No weights saved for layer - %s', layer.name)
+
+                continue
+
+            try:
+                weights = []
+                # Extract weights
+                for term in layer_weights:
+                    if isinstance(layer_weights[term], h5py.Dataset):
+                        # Convert weights to numpy array and prepend to list
+                        weights.insert(0, np.array(layer_weights[term]))
+                    else:
+                        print('No weights saved for layer - %s', layer.name)
+
+                # Load weights to model
+                reshaped_weights = convert_kernel(weights)
+                layer.set_weights(reshaped_weights)
+
+            except Exception as e:
+                print("Error: Could not load weights for layer:", layer.name)
 if __name__ == '__main__':
     _main()
