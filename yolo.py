@@ -25,7 +25,7 @@ class YOLO(object):
         "anchors_path": 'model_data/yolo_anchors.txt',
         "classes_path": 'model_data/coco_classes.txt',
         "score" : 0.0,
-        "iou" : 0.45,
+        "iou" : 0.0,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
     }
@@ -197,7 +197,7 @@ def load_multigpu_checkpoint_weights(model, h5py_file):
                 weight_file = file
             else:
                 weight_file = file["model_3"]
-                
+
             try:
                 layer_weights = weight_file[layer.name]
 
