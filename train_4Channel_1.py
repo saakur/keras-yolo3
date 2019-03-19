@@ -33,8 +33,8 @@ def _main():
         model = create_model(input_shape, anchors, num_classes,
             freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=False) # make sure you know what you freeze
 
-    num_gpus = 4
-    model = multi_gpu_model(model, gpus=num_gpus)
+    # num_gpus = 4
+    # model = multi_gpu_model(model, gpus=num_gpus)
 
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}_1.h5',
