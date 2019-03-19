@@ -191,10 +191,13 @@ def load_multigpu_checkpoint_weights(model, h5py_file):
     with h5py.File(h5py_file, "r") as file:
 
         # Get model subset in file - other layers are empty
-        weight_file = file["model_3"]
 
         for layer in model.layers:
-
+            if 'input' in layer.name:
+                weight_file = file
+            else:
+                weight_file = file["model_3"]
+                
             try:
                 layer_weights = weight_file[layer.name]
 
