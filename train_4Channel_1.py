@@ -31,7 +31,7 @@ def _main():
             freeze_body=2, weights_path='model_data/tiny_yolo_weights.h5')
     else:
         model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=False) # make sure you know what you freeze
+            freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=True) # make sure you know what you freeze
 
     # num_gpus = 4
     # model = multi_gpu_model(model, gpus=num_gpus)
@@ -230,15 +230,16 @@ def load_multigpu_checkpoint_weights(model, h5py_file='model_data/yolo_weights.h
                 weights = []
                 # Extract weights
                 for term in layer_weights:
-                    if isinstance(layer_weights[term], h5py.Dataset):
+                    reshaped_weights = convert_kernel(weights)
+                    # layer.set_weights(reshaped_weights)
+                    if isinstance(reshaped_weights, h5py.Dataset):
                         # Convert weights to numpy array and prepend to list
-                        weights.insert(0, np.array(layer_weights[term]))
+                        weights.insert(0, np.array(reshaped_weights))
                     else:
-                        print('No weights saved for layer - %s', layer.name)
+                        print('***No weights saved for layer - %s', layer.name)
 
                 # Load weights to model
-                reshaped_weights = convert_kernel(weights)
-                layer.set_weights(reshaped_weights)
+                
 
             except Exception as e:
                 print("Error: Could not load weights for layer:", layer.name)
