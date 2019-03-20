@@ -73,6 +73,7 @@ class YOLO(object):
         try:
             self.yolo_model = load_model(model_path, compile=False)
         except:
+            print("In Except. Could not load model directly")
             self.yolo_model = tiny_yolo_body(Input(shape=(None,None,3)), num_anchors//2, num_classes) \
                 if is_tiny_version else yolo_body(Input(shape=(None,None,4)), num_anchors//3, num_classes)
             #self.yolo_model.compile(optimizer=Adam(0.0))
