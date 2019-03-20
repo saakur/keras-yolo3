@@ -24,8 +24,8 @@ class YOLO(object):
         "model_path": '../ep020-loss18.880-val_loss18.810_1.h5',
         "anchors_path": 'model_data/yolo_anchors_TrecVID.txt',
         "classes_path": 'model_data/TrecVID.txt',
-        "score" : 0.0,
-        "iou" : 0.0,
+        "score" : 0.1,
+        "iou" : 0.45,
         "model_image_size" : (416, 416),
         "gpu_num" : 1,
     }
