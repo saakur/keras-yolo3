@@ -18,12 +18,12 @@ def _main():
     annotation_path = '/data/saakur/ActionDetection-TrecVID/Sathya/4Channel/TrecVID_PC_Train_4Channel_Keras.txt'
     log_dir = 'logs/000/'
     classes_path = 'model_data/TrecVID.txt'
-    anchors_path = 'model_data/yolo_anchors_TrecVID.txt'
+    anchors_path = 'model_data/yolo_anchors.txt'
     class_names = get_classes(classes_path)
     num_classes = len(class_names)
     anchors = get_anchors(anchors_path)
 
-    input_shape = (512,512) # multiple of 32, hw
+    input_shape = (416,416) # multiple of 32, hw
 
     is_tiny_version = len(anchors)==6 # default setting
     if is_tiny_version:
@@ -31,14 +31,14 @@ def _main():
             freeze_body=2, weights_path='model_data/tiny_yolo_weights.h5')
     else:
         model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='model_data/yolo_weights.h5', load_pretrained=False) # make sure you know what you freeze
+            freeze_body=2, weights_path='./logs/000/ep001-loss52.415-val_loss23.877_1.h5', load_pretrained=True) # make sure you know what you freeze
 
-    num_gpus = 4
-    model = multi_gpu_model(model, gpus=num_gpus)
+    # num_gpus = 4
+    # model = multi_gpu_model(model, gpus=num_gpus)
 
     logging = TensorBoard(log_dir=log_dir)
-    checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}_512x512.h5',
-        monitor='val_loss', save_weights_only=True, save_best_only=True, period=1)
+    checkpoint = ModelCheckpoint(log_dir + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}_noRandom.h5',
+        monitor='val_loss', save_weights_only=False, save_best_only=True, period=1)
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, verbose=1)
     early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=1)
 
@@ -53,41 +53,42 @@ def _main():
 
     # Train with frozen layers first, to get a stable loss.
     # Adjust num epochs to your dataset. This step is enough to obtain a not bad model.
-    if True:
-        model.layers[0].trainable = True
-        model.compile(optimizer=Adam(lr=1e-3), loss={
-            # use custom yolo_loss Lambda layer.
-            'yolo_loss': lambda y_true, y_pred: y_pred[0]})
-
-        batch_size = 32
-        print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-        model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
-                steps_per_epoch=max(1, num_train//batch_size),
-                validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
-                validation_steps=max(1, num_val//batch_size),
-                epochs=50,
-                initial_epoch=0,
-                callbacks=[logging, checkpoint])
-        model.save_weights(log_dir + 'trained_weights_stage_1.h5')
-
-    # # Unfreeze and continue training, to fine-tune.
-    # # Train longer if the result is not good.
     # if True:
-    #     for i in range(len(model.layers)):
-    #         model.layers[i].trainable = True
-    #     model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
-    #     print('Unfreeze all of the layers.')
+    #     model.layers[0].trainable = True
+    #     model.compile(optimizer=Adam(lr=1e-3), loss={
+    #         # use custom yolo_loss Lambda layer.
+    #         'yolo_loss': lambda y_true, y_pred: y_pred[0]})
 
-    #     batch_size = 16 # note that more GPU memory is required after unfreezing the body
+    #     batch_size = 48
     #     print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
     #     model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
-    #         steps_per_epoch=max(1, num_train//batch_size),
-    #         validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
-    #         validation_steps=max(1, num_val//batch_size),
-    #         epochs=100,
-    #         initial_epoch=50,
-    #         callbacks=[logging, checkpoint, reduce_lr, early_stopping])
-    #     model.save_weights(log_dir + 'trained_weights_final.h5')
+    #             steps_per_epoch=max(1, num_train//batch_size),
+    #             validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
+    #             validation_steps=max(1, num_val//batch_size),
+    #             epochs=50,
+    #             initial_epoch=0,
+    #             callbacks=[logging, checkpoint])
+    #     model.save_weights(log_dir + 'trained_weights_stage_1.h5')
+
+    # Unfreeze and continue training, to fine-tune.
+    # Train longer if the result is not good.
+    if True:
+        load_multigpu_checkpoint_weights(model)
+        for i in range(len(model.layers)):
+            model.layers[i].trainable = True
+        model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
+        print('Unfreeze all of the layers.')
+
+        batch_size = 16 # note that more GPU memory is required after unfreezing the body
+        print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
+        model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
+            steps_per_epoch=max(1, num_train//batch_size),
+            validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
+            validation_steps=max(1, num_val//batch_size),
+            epochs=100,
+            initial_epoch=0,
+            callbacks=[logging, checkpoint, reduce_lr, early_stopping])
+        model.save_weights(log_dir + 'trained_weights_final.h5')
 
     # Further training if needed.
 
@@ -178,7 +179,7 @@ def data_generator(annotation_lines, batch_size, input_shape, anchors, num_class
             if i==0:
                 np.random.shuffle(annotation_lines)
             # image, box = get_random_data(annotation_lines[i], input_shape, random=True, scaled=False)
-            image, box = get_random_data(annotation_lines[i], input_shape, random=True, scaled=True)
+            image, box = get_random_data(annotation_lines[i], input_shape, random=False, scaled=True)
             image_data.append(image)
             box_data.append(box)
             i = (i+1) % n
@@ -192,5 +193,55 @@ def data_generator_wrapper(annotation_lines, batch_size, input_shape, anchors, n
     if n==0 or batch_size<=0: return None
     return data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes)
 
+def load_multigpu_checkpoint_weights(model, h5py_file='model_data/yolo_weights.h5'):
+    """
+    Loads the weights of a weight checkpoint from a multi-gpu
+    keras model.
+
+    Input:
+
+        model - keras model to load weights into
+
+        h5py_file - path to the h5py weights file
+
+    Output:
+        None
+    """
+    import h5py
+    from keras.utils.conv_utils import convert_kernel
+
+    print("Setting weights...")
+    with h5py.File(h5py_file, "r") as file:
+
+        # Get model subset in file - other layers are empty
+
+        for layer in model.layers:
+            weight_file = file
+
+            try:
+                layer_weights = weight_file[layer.name]
+
+            except:
+                print('No weights saved for layer - %s', layer.name)
+
+                continue
+
+            try:
+                weights = []
+                # Extract weights
+                for term in layer_weights:
+                    reshaped_weights = convert_kernel(weights)
+                    # layer.set_weights(reshaped_weights)
+                    if isinstance(reshaped_weights, h5py.Dataset):
+                        # Convert weights to numpy array and prepend to list
+                        weights.insert(0, np.array(reshaped_weights))
+                    else:
+                        print('***No weights saved for layer - %s', layer.name)
+
+                # Load weights to model
+                
+
+            except Exception as e:
+                print("Error: Could not load weights for layer:", layer.name)
 if __name__ == '__main__':
     _main()
