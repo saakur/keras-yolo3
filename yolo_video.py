@@ -2,6 +2,7 @@ import sys
 import argparse, cv2
 from yolo import YOLO, detect_video
 from PIL import Image
+import numpy as np
 
 def detect_img(yolo):
     while True:
@@ -13,6 +14,7 @@ def detect_img(yolo):
             continue
         else:
             image.resize((416,416), Image.ANTIALIAS)
+            print(np.array(image).shape)
             r_image = yolo.detect_image(image)
             # r_image.show()
             r_image.save('detections.png')
